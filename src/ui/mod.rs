@@ -245,6 +245,9 @@ where
     RouteId::AlbumTracks => {
       draw_album_table(f, app, chunks[1]);
     }
+    RouteId::NewReleases => {
+      draw_new_releases_list(f, app, chunks[1]);
+    }
     RouteId::RecentlyPlayed => {
       draw_recently_played_table(f, app, chunks[1]);
     }
@@ -1407,6 +1410,66 @@ where
       app,
       layout_chunk,
       ("Saved Albums", &header),
+      &items,
+      selected_song_index,
+      highlight_state,
+    )
+  };
+}
+
+pub fn draw_new_releases_list<B>(f: &mut Frame<B>, app: &App, layout_chunk: Rect)
+where
+  B: Backend,
+{
+  let header = TableHeader {
+    id: TableId::AlbumList,
+    items: vec![
+      TableHeaderItem {
+        text: "Name",
+        width: get_percentage_width(layout_chunk.width, 2.0/5.0),
+        ..Default::default()
+      },
+      TableHeaderItem {
+        text: "Artists",
+        width: get_percentage_width(layout_chunk.width, 2.0/5.0),
+        ..Default::default()
+      },
+      TableHeaderItem {
+        text: "Release Date",
+        width: get_percentage_width(layout_chunk.width, 1.0/5.0),
+        ..Default::default()
+      },
+    ],
+  };
+
+  let current_route = app.get_current_route();
+
+  let highlight_state = (
+    current_route.active_block == ActiveBlock::AlbumList,
+    current_route.hovered_block == ActiveBlock::AlbumList,
+  );
+
+  let selected_song_index = app.album_list_index;
+
+  if let Some(new_releases) = app.new_releases.get_results(None) {
+    let items = new_releases
+      .items
+      .iter()
+      .map(|album_page| TableItem {
+        id: album_page.id.clone().unwrap_or_else(|| "".to_string()),
+        format: vec![
+          album_page.name.to_owned(),
+          create_artist_string(&album_page.artists),
+          album_page.release_date.clone().unwrap_or_else(|| "".to_string()),
+        ],
+      })
+      .collect::<Vec<TableItem>>();
+
+    draw_table(
+      f,
+      app,
+      layout_chunk,
+      ("New Releases", &header),
       &items,
       selected_song_index,
       highlight_state,

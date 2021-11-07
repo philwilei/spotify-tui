@@ -29,13 +29,14 @@ use tui::layout::Rect;
 
 use arboard::Clipboard;
 
-pub const LIBRARY_OPTIONS: [&str; 6] = [
+pub const LIBRARY_OPTIONS: [&str; 7] = [
   "Made For You",
   "Recently Played",
   "Liked Songs",
   "Albums",
   "Artists",
   "Podcasts",
+  "New Releases"
 ];
 
 const DEFAULT_ROUTE: Route = Route {
@@ -128,6 +129,7 @@ pub enum ActiveBlock {
   Input,
   Library,
   MyPlaylists,
+  NewReleases,
   Podcasts,
   EpisodeTable,
   RecentlyPlayed,
@@ -149,6 +151,7 @@ pub enum RouteId {
   BasicView,
   Error,
   Home,
+  NewReleases,
   RecentlyPlayed,
   Search,
   SelectedDevice,
@@ -287,6 +290,7 @@ pub struct App {
   pub made_for_you_offset: u32,
   pub playlist_tracks: Option<Page<PlaylistTrack>>,
   pub made_for_you_tracks: Option<Page<PlaylistTrack>>,
+  pub new_releases: ScrollableResultPages<Page<SimplifiedAlbum>>,
   pub playlists: Option<Page<SimplifiedPlaylist>>,
   pub recently_played: SpotifyResultAndSelectedIndex<Option<CursorBasedPage<PlayHistory>>>,
   pub recommended_tracks: Vec<FullTrack>,
@@ -339,6 +343,7 @@ impl Default for App {
       artist: None,
       user_config: UserConfig::new(),
       saved_album_tracks_index: 0,
+      new_releases: ScrollableResultPages::new(),
       recently_played: Default::default(),
       size: Rect::default(),
       selected_album_simplified: None,

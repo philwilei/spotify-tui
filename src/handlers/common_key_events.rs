@@ -111,6 +111,9 @@ pub fn handle_right_event(app: &mut App) {
       RouteId::Artists => {
         app.set_current_route_state(Some(ActiveBlock::Artists), Some(ActiveBlock::Artists));
       }
+      RouteId::NewReleases => {
+        app.set_current_route_state(Some(ActiveBlock::NewReleases), Some(ActiveBlock::NewReleases));
+      }
       RouteId::RecentlyPlayed => {
         app.set_current_route_state(
           Some(ActiveBlock::RecentlyPlayed),

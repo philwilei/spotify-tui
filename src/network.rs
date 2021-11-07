@@ -87,6 +87,7 @@ pub enum IoEvent {
   GetShowEpisodes(Box<SimplifiedShow>),
   GetShow(String),
   GetCurrentShowEpisodes(String, Option<u32>),
+  GetNewReleases(Option<u32>),
   AddItemToQueue(String),
 }
 
@@ -298,6 +299,9 @@ impl<'a> Network<'a> {
       }
       IoEvent::GetCurrentShowEpisodes(show_id, offset) => {
         self.get_current_show_episodes(show_id, offset).await;
+      }
+      IoEvent::GetNewReleases(offset) => {
+        self.get_new_releases(offset).await;
       }
       IoEvent::AddItemToQueue(item) => {
         self.add_item_to_queue(item).await;
@@ -570,6 +574,24 @@ impl<'a> Network<'a> {
         if !episodes.items.is_empty() {
           let mut app = self.app.lock().await;
           app.library.show_episodes.add_pages(episodes);
+        }
+      }
+      Err(e) => {
+        self.handle_error(anyhow!(e)).await;
+      }
+    }
+  }
+
+  async fn get_new_releases(&mut self, offset: Option<u32>) {
+    match self
+        .spotify
+        .new_releases(Option::from(Country::Germany), self.large_search_limit, offset)
+        .await
+    {
+      Ok(new_releases) => {
+        if !new_releases.albums.items.is_empty() {
+          let mut app = self.app.lock().await;
+          app.new_releases.add_pages(new_releases.albums);
         }
       }
       Err(e) => {
