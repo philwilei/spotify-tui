@@ -161,7 +161,7 @@ fn handle_block_events(key: Key, app: &mut App) {
       podcasts::handler(key, app);
     }
     ActiveBlock::NewReleases => {
-      empty::handler(key, app);
+      new_releases::handler(key, app);
     }
     ActiveBlock::PlayBar => {
       playbar::handler(key, app);

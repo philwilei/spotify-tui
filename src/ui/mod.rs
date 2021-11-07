@@ -1445,11 +1445,11 @@ where
   let current_route = app.get_current_route();
 
   let highlight_state = (
-    current_route.active_block == ActiveBlock::AlbumList,
-    current_route.hovered_block == ActiveBlock::AlbumList,
+    current_route.active_block == ActiveBlock::NewReleases,
+    current_route.hovered_block == ActiveBlock::NewReleases,
   );
 
-  let selected_song_index = app.album_list_index;
+  let selected_song_index = app.new_releases_index;
 
   if let Some(new_releases) = app.new_releases.get_results(None) {
     let items = new_releases
