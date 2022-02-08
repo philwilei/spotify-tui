@@ -1456,13 +1456,21 @@ where
     let items = new_releases
       .items
       .iter()
-      .map(|album_page| TableItem {
-        id: album_page.id.clone().unwrap_or_else(|| "".to_string()),
-        format: vec![
-          album_page.name.to_owned(),
-          create_artist_string(&album_page.artists),
-          album_page.release_date.clone().unwrap_or_else(|| "".to_string()),
-        ],
+      .map(|album_page| {
+        let mut album_title = album_page.name.clone();
+        let album_id = &album_page.id.clone().unwrap_or_else(|| "".to_string());
+        if app.saved_album_ids_set.contains(album_id) {
+          album_title.insert_str(0, &app.user_config.padded_liked_icon());
+        }
+        let item = TableItem {
+          id: album_page.id.clone().unwrap_or_else(|| "".to_string()),
+          format: vec![
+            album_title,
+            create_artist_string(&album_page.artists),
+            album_page.release_date.clone().unwrap_or_else(|| "".to_string()),
+          ]
+        };
+        item
       })
       .collect::<Vec<TableItem>>();
 

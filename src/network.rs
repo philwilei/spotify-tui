@@ -583,14 +583,29 @@ impl<'a> Network<'a> {
   }
 
   async fn get_new_releases(&mut self, offset: Option<u32>) {
+    // FIXME: Get user's location from the profile
     match self
         .spotify
-        .new_releases(Option::from(Country::Germany), self.large_search_limit, offset)
+        .new_releases(
+          Option::from(Country::Germany),
+          self.large_search_limit,
+          offset
+        )
         .await
     {
       Ok(new_releases) => {
+        let mut app = self.app.lock().await;
+
         if !new_releases.albums.items.is_empty() {
-          let mut app = self.app.lock().await;
+          //
+          app.dispatch(IoEvent::CurrentUserSavedAlbumsContains(new_releases
+            .albums
+            .items
+            .iter()
+            .filter_map(|album| album.id.to_owned())
+            .collect::<Vec<String>>()
+          ));
+
           app.new_releases.add_pages(new_releases.albums);
         }
       }
